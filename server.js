@@ -1,33 +1,29 @@
 'use strict';
 
-var express = require('express');
-var routes = require('./app/routes/index.js');
-var mongoose = require('mongoose');
-var passport = require('passport');
-var session = require('express-session');
+var express = require('express'),
+	path = require('path'),
+	fs = require('fs'),
+	multer = require('multer'),
+	uploads = multer({ dest: path.join(__dirname, 'uploads/') });
 
+var port = process.env.PORT || 8080,
+	appUrl = process.env.APP_URL;
+
+require('dotenv').config();
 var app = express();
-require('dotenv').load();
-require('./app/config/passport')(passport);
 
-mongoose.connect(process.env.MONGO_URI);
+app.use(express.static('public'));
 
-app.use('/controllers', express.static(process.cwd() + '/app/controllers'));
-app.use('/public', express.static(process.cwd() + '/public'));
-app.use('/common', express.static(process.cwd() + '/app/common'));
+app.post('/upload', uploads.single('file'), function(req, res) {
+	
+	var result = {
+		fileName: req.file.originalname,
+		fileSize: parseInt(req.file.size / 1024) + ' KB'
+	}
+	res.json(result);
+	
+});
 
-app.use(session({
-	secret: 'secretClementine',
-	resave: false,
-	saveUninitialized: true
-}));
-
-app.use(passport.initialize());
-app.use(passport.session());
-
-routes(app, passport);
-
-var port = process.env.PORT || 8080;
 app.listen(port,  function () {
 	console.log('Node.js listening on port ' + port + '...');
 });
