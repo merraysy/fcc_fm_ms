@@ -2,12 +2,10 @@
 
 var express = require('express'),
 	path = require('path'),
-	fs = require('fs'),
 	multer = require('multer'),
 	uploads = multer({ dest: path.join(__dirname, 'uploads/') });
 
-var port = process.env.PORT || 8080,
-	appUrl = process.env.APP_URL;
+var port = process.env.PORT || 8080;
 
 require('dotenv').config();
 var app = express();
